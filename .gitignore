@@ -1,0 +1,4 @@
+.env
+tailored_cvs/
+__pycache__/
+venv/
