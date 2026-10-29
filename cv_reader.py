@@ -57,6 +57,7 @@ def extract_skills_from_folder(folder: str = ".", blocked=(), extra=()) -> list[
         per_cv.append(skills)
 
     blocked = {b.lower() for b in blocked}
+    print("blocked{blocked}")
     merged, seen = [], set()
     # round-robin so the strongest skill of every CV comes first
     for i in range(max(len(s) for s in per_cv)):
@@ -69,4 +70,5 @@ def extract_skills_from_folder(folder: str = ".", blocked=(), extra=()) -> list[
     for skill in extra:
         if skill.lower() not in seen:
             merged.append(skill.lower())
+    print("final skills are {merged}")
     return merged
