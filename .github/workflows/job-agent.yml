@@ -1,0 +1,46 @@
+name: Job Agent
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # every 6 hours (UTC). Lower the number to run more often.
+  workflow_dispatch:         # lets you press "Run workflow" by hand
+
+permissions:
+  contents: write            # needed to save seen_jobs.json back to the repo
+
+concurrency:
+  group: job-agent
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install requirements
+        run: pip install -r requirements.txt
+
+      - name: Run job agent
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODEL: ${{ secrets.GROQ_MODEL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          BLOCKED_SKILLS: ${{ secrets.BLOCKED_SKILLS }}
+        run: python main.py
+
+      - name: Remember seen jobs (so you never get the same job twice)
+        if: always()
+        run: |
+          git config user.name "job-agent-bot"
+          git config user.email "job-agent-bot@users.noreply.github.com"
+          if [ -f seen_jobs.json ]; then git add seen_jobs.json; fi
+          git diff --cached --quiet || (git commit -m "update seen jobs" && git push)
