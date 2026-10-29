@@ -38,7 +38,7 @@ def send_email(subject, text_body, html_body, attachments=None):
     if r.status_code >= 400:
         sys.exit(f"Resend error {r.status_code}: {r.text}\n"
                  "Common causes: wrong API key; or using onboarding@resend.dev while "
-                 "EMAIL_TO is not the email you signed up to Resend with; or EMAIL_FROM "
+                 "EMAIL_TO {config.EMAIL_TO}is not the email you signed up to Resend with; or EMAIL_FROM{config.EMAIL_FROM} "
                  "uses a domain you have not verified in Resend.")
     return r.json()
 
