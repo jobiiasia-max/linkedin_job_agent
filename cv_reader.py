@@ -64,7 +64,7 @@ def extract_skills_from_folder(folder: str = ".", blocked=(), extra=()) -> list[
         for skills in per_cv:
             if i < len(skills):
                 skill = skills[i]
-                if skill not in seen and skill not in blocked:
+                if skill not in seen and skill.lower not in blocked:
                     seen.add(skill)
                     merged.append(skill)
     for skill in extra:
