@@ -45,6 +45,7 @@ def find_cv_files(folder: str = ".") -> list[Path]:
 
 
 def extract_skills_from_folder(folder: str = ".", blocked=(), extra=()) -> list[str]:
+    print(blocked)
     """Run extract_skills on every PDF, merge, remove duplicates and unwanted words."""
     files = find_cv_files(folder)
     if not files:
