@@ -45,7 +45,6 @@ def find_cv_files(folder: str = ".") -> list[Path]:
 
 
 def extract_skills_from_folder(folder: str = ".", blocked=(), extra=()) -> list[str]:
-    print(blocked)
     """Run extract_skills on every PDF, merge, remove duplicates and unwanted words."""
     files = find_cv_files(folder)
     if not files:
@@ -57,19 +56,23 @@ def extract_skills_from_folder(folder: str = ".", blocked=(), extra=()) -> list[
         print(f"  {f.name}: {skills}")
         per_cv.append(skills)
 
-    blocked = {b.lower() for b in blocked}
-    print(f"blocked{blocked}")
+    blocked = {b.lower().strip() for b in blocked}
+    print(f"blocked {blocked}")
     merged, seen = [], set()
     # round-robin so the strongest skill of every CV comes first
     for i in range(max(len(s) for s in per_cv)):
         for skills in per_cv:
             if i < len(skills):
                 skill = skills[i]
-                if skill not in seen and skill.lower not in blocked:
-                    seen.add(skill)
+                key = skill.lower().strip()
+                if key not in seen and key not in blocked:
+                    seen.add(key)
                     merged.append(skill)
     for skill in extra:
-        if skill.lower() not in seen:
-            merged.append(skill.lower())
+        key = skill.lower().strip()
+        if key not in seen and key not in blocked:
+            seen.add(key)
+            merged.append(key)
     print(f"final skills are {merged}")
+    return merged
     return merged
