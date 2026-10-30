@@ -14,7 +14,7 @@ from utils import load_seen, log, save_seen
 def get_skills():
     log(f"CV reader: reading PDFs in {config.CV_FOLDER}")
     skills = extract_skills_from_folder(
-        config.CV_FOLDER, blocked=['python','automation developer', 'rpa engineer', 'c#', '.net core', 'selenium'], extra=config.EXTRA_SKILLS)
+        config.CV_FOLDER, blocked=['huawei','islamabad'], extra=config.EXTRA_SKILLS)
     log(f"CV reader: final skills = {skills}")
     return skills
 
