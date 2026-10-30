@@ -65,10 +65,10 @@ def _extra_facts():
     return p.read_text(encoding="utf-8", errors="ignore").strip() if p.exists() else ""
 
 
-MODELS = [
-    "llama-3.3-70b-versatile",
-    "llama-3.1-8b-instant",   # backup, check console.groq.com for current names
-]
+MODELS = list(dict.fromkeys([
+    os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+    "llama-3.1-8b-instant",
+]))
 
 
 class DailyLimitReached(Exception):
