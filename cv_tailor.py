@@ -65,15 +65,52 @@ def _extra_facts():
     return p.read_text(encoding="utf-8", errors="ignore").strip() if p.exists() else ""
 
 
+MODELS = list(dict.fromkeys([
+    os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+    "llama-3.1-8b-instant",   # check console.groq.com for current model names/limits
+]))
+
+
+class DailyLimitReached(Exception):
+    """Raised when every model has hit its rate limit."""
+
+
+def _is_rate_limit(e: Exception) -> bool:
+    msg = str(e)
+    return "429" in msg or "rate_limit" in msg
+
+
+def _is_daily_limit(e: Exception) -> bool:
+    msg = str(e)
+    return "tokens per day" in msg or "(TPD)" in msg
+
+
 def _invoke(prompt, retries=3):
-    llm = ChatGroq(model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"), temperature=0.2)
-    for attempt in range(retries):
-        try:
-            return llm.invoke(prompt).content
-        except Exception:
-            if attempt == retries - 1:
-                raise
-            time.sleep(20 * (attempt + 1))   # Groq rate limit: wait and retry
+    for model in MODELS:
+        llm = ChatGroq(model=model, temperature=0.2)
+        for attempt in range(retries):
+            try:
+                return llm.invoke(prompt).content
+            except Exception as e:
+                if not _is_rate_limit(e):
+                    # Not a rate limit: retry a couple of times, then raise as before
+                    if attempt == retries - 1:
+                        raise
+                    time.sleep(20 * (attempt + 1))
+                    continue
+
+                if _is_daily_limit(e):
+                    # Waiting won't help, move to the next model immediately
+                    print(f"{model}: daily token limit reached, trying next model...")
+                    break
+
+                # Per-minute limit: short wait is enough, then retry
+                if attempt == retries - 1:
+                    print(f"{model}: still rate limited, trying next model...")
+                    break
+                time.sleep(20 * (attempt + 1))
+
+    raise DailyLimitReached("All Groq models are rate limited right now")
 
 
 def _json(reply):
