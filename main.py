@@ -28,12 +28,12 @@ def run_once(dry_run=False):
         for j in good:
             print(f"- [{j['score']}%] {j['title']} | {j['company']} | "
                   f"{j['mode']} | {j['location']}\n  {j['url']}")
-        if config.TAILOR_CVS and good:
-            generate_tailored_cvs(good)   # PDFs are saved in tailored_cvs/ only
-        log("Dry run: no email sent, seen list not saved.")
-        return
-    if config.TAILOR_CVS and good:
-        generate_tailored_cvs(good)       # tailored PDFs, one per selected job
+    #     if config.TAILOR_CVS and good:
+    #         generate_tailored_cvs(good)   # PDFs are saved in tailored_cvs/ only
+    #     log("Dry run: no email sent, seen list not saved.")
+    #     return
+    # if config.TAILOR_CVS and good:
+    #     generate_tailored_cvs(good)       # tailored PDFs, one per selected job
     send_matches(good)                    # ONE email: jobs + apply links + CVs attached
     save_seen(config.SEEN_FILE, seen)
 
