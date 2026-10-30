@@ -65,9 +65,11 @@ def _extra_facts():
     return p.read_text(encoding="utf-8", errors="ignore").strip() if p.exists() else ""
 
 
+
 MODELS = list(dict.fromkeys([
-    os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
-    "llama-3.1-8b-instant",
+    os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
+    "openai/gpt-oss-20b",
+    "qwen/qwen3.8-27b",
 ]))
 
 
